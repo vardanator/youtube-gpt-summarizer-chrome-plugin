@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Summarizer for ChatGPT",
+  "short_name": "YT Summarizer",
+  "version": "1.0.0",
+  "description": "Summarize the YouTube video in your current tab with ChatGPT. Summary and timestamped key highlights appear in the side panel.",
+  "minimum_chrome_version": "116",
+  "permissions": ["sidePanel", "storage", "scripting"],
+  "host_permissions": ["https://*.youtube.com/*", "https://api.openai.com/*"],
+  "optional_host_permissions": ["https://chatgpt.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "sidepanel/index.html"
+  },
+  "action": {
+    "default_title": "Summarize this video",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*", "https://m.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

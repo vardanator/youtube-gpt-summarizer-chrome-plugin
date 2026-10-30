@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>YouTube Summarizer</title>
+    <link rel="stylesheet" href="panel.css" />
+    <script type="module" src="panel.js"></script>
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand">
+        <img src="../icons/icon32.png" alt="" width="20" height="20" />
+        <span>Video Summary</span>
+      </div>
+      <button id="settings-button" class="icon-button" type="button" title="Settings" aria-label="Settings" hidden>
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M19.14 12.94a7.07 7.07 0 0 0 0-1.88l2.03-1.58a.5.5 0 0 0 .12-.64l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7.03 7.03 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.24-1.12.55-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.67 8.84a.5.5 0 0 0 .12.64l2.03 1.58a7.07 7.07 0 0 0 0 1.88l-2.03 1.58a.5.5 0 0 0-.12.64l1.92 3.32c.13.22.39.3.6.22l2.39-.96c.5.39 1.04.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.58-.24 1.12-.55 1.62-.94l2.39.96c.22.08.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.64l-2.03-1.58ZM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7Z"
+          />
+        </svg>
+      </button>
+    </header>
+
+    <main>
+      <!-- Shown until a way to reach ChatGPT is chosen. -->
+      <section id="connect-view" class="view" hidden>
+        <h1>Connect ChatGPT</h1>
+        <p class="lead">Choose how summaries get written.</p>
+
+        <div class="option">
+          <h2>Use my ChatGPT login</h2>
+          <p>
+            Works with a free or paid ChatGPT account; no API credits needed. Each summary is sent to ChatGPT in a
+            background tab, which closes when it's done.
+          </p>
+          <button id="use-chatgpt-button" type="button" class="primary wide">Use ChatGPT</button>
+          <p id="chatgpt-error" class="form-error" role="alert" hidden></p>
+        </div>
+
+        <details class="option">
+          <summary>Use an OpenAI API key instead</summary>
+          <form id="connect-form" class="stack">
+            <label for="api-key">OpenAI API key</label>
+            <input id="api-key" type="password" placeholder="sk-…" autocomplete="off" spellcheck="false" required />
+            <button id="connect-button" type="submit" class="primary">Connect</button>
+            <p id="connect-error" class="form-error" role="alert" hidden></p>
+          </form>
+          <ol class="steps">
+            <li>
+              Sign in at
+              <a href="https://platform.openai.com/api-keys" target="_blank" rel="noreferrer">platform.openai.com/api-keys</a>
+              with your ChatGPT login.
+            </li>
+            <li>Create a secret key and paste it above.</li>
+            <li>
+              API usage is billed separately from a ChatGPT subscription. With a mini model, a typical summary costs
+              about a cent or less.
+            </li>
+          </ol>
+          <p class="fine-print">Your key is stored only in this browser and is sent only to api.openai.com.</p>
+        </details>
+      </section>
+
+      <section id="settings-view" class="view" hidden>
+        <button id="settings-back" type="button" class="link-button">← Back</button>
+        <h1>Settings</h1>
+        <div class="account">
+          <div>
+            <div class="account-label">Connected with</div>
+            <div id="connection-label"></div>
+          </div>
+          <button id="disconnect-button" type="button" class="secondary">Disconnect</button>
+        </div>
+
+        <div class="stack">
+          <div id="api-settings" class="stack">
+            <label for="model">Model</label>
+            <input id="model" list="model-options" autocomplete="off" spellcheck="false" />
+            <datalist id="model-options"></datalist>
+            <p class="hint">Any model your key can use. Small "mini" models are fast and cheap.</p>
+          </div>
+
+          <label id="chatgpt-settings" class="checkbox">
+            <input id="keep-history" type="checkbox" />
+            Save summary chats in my ChatGPT history
+          </label>
+
+          <label for="language">Summary language</label>
+          <select id="language">
+            <option value="auto">Same as the video</option>
+            <option>English</option>
+            <option>Spanish</option>
+            <option>French</option>
+            <option>German</option>
+            <option>Italian</option>
+            <option>Portuguese</option>
+            <option>Dutch</option>
+            <option>Polish</option>
+            <option>Ukrainian</option>
+            <option>Russian</option>
+            <option>Armenian</option>
+            <option>Turkish</option>
+            <option>Arabic</option>
+            <option>Hindi</option>
+            <option>Chinese (Simplified)</option>
+            <option>Japanese</option>
+            <option>Korean</option>
+          </select>
+        </div>
+      </section>
+
+      <section id="main-view" class="view" hidden>
+        <div id="no-video" class="empty" hidden>
+          <div class="empty-icon" aria-hidden="true">▶</div>
+          <h2>Open a YouTube video</h2>
+          <p>Switch to a tab playing a YouTube video and its summary will show up here.</p>
+        </div>
+
+        <div id="video" hidden>
+          <div class="video-card">
+            <img id="thumbnail" alt="" width="112" height="63" />
+            <div class="video-text">
+              <h2 id="video-title"></h2>
+              <p id="video-channel"></p>
+            </div>
+          </div>
+
+          <button id="summarize-button" type="button" class="primary wide">Summarize video</button>
+
+          <div id="progress" class="progress" role="status" hidden>
+            <span class="spinner" aria-hidden="true"></span>
+            <span id="progress-text"></span>
+            <button id="progress-tab-button" type="button" class="link-button show-tab" hidden>Show ChatGPT tab</button>
+          </div>
+
+          <div id="error" class="error-box" role="alert" hidden>
+            <p id="error-text"></p>
+            <div class="error-actions">
+              <button id="retry-button" type="button" class="secondary">Try again</button>
+              <button id="error-tab-button" type="button" class="secondary" hidden>Show ChatGPT tab</button>
+              <button
+                id="error-debug-button"
+                type="button"
+                class="link-button copy-details"
+                title="Copies a description of the ChatGPT page's layout, without any chat text, for troubleshooting"
+                hidden
+              >
+                Copy details
+              </button>
+            </div>
+          </div>
+
+          <article id="result" class="result" hidden></article>
+
+          <footer id="result-footer" class="result-footer" hidden>
+            <span id="result-meta"></span>
+            <div class="result-actions">
+              <button id="copy-button" type="button" class="secondary small">Copy</button>
+              <button id="regenerate-button" type="button" class="secondary small">Regenerate</button>
+            </div>
+          </footer>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
